@@ -1,8 +1,10 @@
 ### mcnColors
 
-This directory contains efficient GPU implementations for color space transformations, designed to interface with MatConvNet. Each transformation is supported on batches of images (as four dimensional tensors).  It currently supports:
+This directory contains efficient GPU implementations for color space transformations, designed to interface directly with MatConvNet. Each transformation is supported on batches of images (as four dimensional tensors).  
 
-* rgb2hsv
+### Supported transformations
+
+* **rgb2hsv**
 
 ### Installation
 
@@ -12,7 +14,7 @@ The easiest way to use this module is to install it with the `vl_contrib` packag
 vl_contrib('install', 'mcnColors') ;
 vl_contrib('compile', 'mcnColors') ;
 vl_contrib('setup', 'mcnColors') ;
-vl_contrib('test', 'mcnColors') ;
+vl_contrib('test', 'mcnColors') ; % optional
 ```
 
 ### Notes
