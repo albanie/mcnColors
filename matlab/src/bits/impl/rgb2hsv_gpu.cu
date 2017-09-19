@@ -56,31 +56,37 @@ rgb2hsv_kernel(T* output,
       valid_range[0] = 1 ;
      }
    
-    T out ;
+    T out, sat ;
     T maxRGB = max(R, max(G, B)) ;
     T minRGB = min(R, min(G, B)) ;
     T delta = maxRGB - minRGB ;
+    // it is safer to do slightly extra work here
+    if (maxRGB == 0) {
+        sat = 0 ;
+    } else {
+        sat = delta / maxRGB ;
+    }
+
     switch (c) { // H, S or V output
       case 0: // Compute hue
-        out = data[rIdx] ;
-        if (R == maxRGB) {
-          out = (G - B) / delta ;
-        } else if (G == maxRGB) {
-          out = 2 + ( B - R ) / delta ;
-        } else { // B max
-          out = 4 + ( R - G ) / delta ;
-        } 
-        out = out / 6 ; // use [0,1], rather than 360 degrees
-        if (out < 0) {
-          out = out + 1 ; 
+        if (sat == 0) {
+          out = 0 ; // fix hue to zero
+        } else {
+          if (R == maxRGB) {
+            out = (G - B) / delta ;
+          } else if (G == maxRGB) {
+            out = 2 + ( B - R ) / delta ;
+          } else { // B max
+            out = 4 + ( R - G ) / delta ;
+          } 
+          out = out / 6 ; // use [0,1], rather than 360 degrees
+          if (out < 0) {
+            out = out + 1 ; 
+          }
         }
         break ;
       case 1: // compute saturation
-        if (maxRGB == 0) {
-          out = 0 ; // follow matlab convention
-        } else {
-          out = delta / maxRGB ;
-        }
+        out = sat ;
         break ;
       case 2: // compute value
         out = maxRGB ; // store value

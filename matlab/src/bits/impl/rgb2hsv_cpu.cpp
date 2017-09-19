@@ -61,9 +61,12 @@ namespace vl { namespace impl {
             T val = max ;
             if (max == 0) {
               sat = 0 ; 
-              hue = 0 ;
             } else {
               sat = delta / max ;
+            }
+            if (sat == 0) {
+                hue = 0 ;
+            } else {
               if (R == max) {
                 hue = (G - B) / delta ;
               } else if (G == max) {
