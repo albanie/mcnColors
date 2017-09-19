@@ -5,5 +5,12 @@
 %   in the native `rgb2hsv` MATLAB function, elements in the output
 %   HSV space are also normalised to lie in [0,1].
 %
+%   VL_NNRGB2HSV(..., 'option', value, ...) accepts the following
+%   options:
+%
+%   `reverse`:: false
+%    The reverse flag will transform inputs in the direction i.e. from HSV
+%    space to RGB space.
+%
 % Copyright (C) 2017 Samuel Albanie 
 % Licensed under The MIT License [see LICENSE.md for details]
