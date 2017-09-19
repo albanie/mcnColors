@@ -7,7 +7,23 @@ function run_benchmarks(varargin)
 %   options:
 %
 %   `gpus`:: 1
-%    Device on which to run network 
+%    Device(s) on which to run the comparison.
+%
+%   `imSz`:: 600
+%    Width of the square image used for testing. 
+%
+%   `repeats`:: 10
+%    Number of times to repeat the benchmark for consistency. 
+%
+%   `native`:: rgb2hsv
+%    Native color transformation function to be used as a baseline. 
+%
+%   `mcnFunc`:: vl_rgb2hsv
+%    Color transformation function to be tested. 
+%
+%   `includeRTimes`:: false
+%    Include a timing that uses reshaping, rather than a for-loop to 
+%    benchmark the native function on multiple image instances. 
 %
 % Copyright (C) 2017 Samuel Albanie
 % Licensed under The MIT License [see LICENSE.md for details]
