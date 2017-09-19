@@ -15,10 +15,14 @@ function run_benchmarks(varargin)
   opts.gpus = 1 ;
   opts.imSz = 600 ;
   opts.repeats = 10 ;
+  opts.native = @rgb2hsv ;
+  opts.mcnFunc = @vl_rgb2hsv ;
+  opts.includeRTimes = false ;
   opts = vl_argparse(opts, varargin) ;
 
-  mTimes = zeros(1, opts.repeats) ;
+  mTimes = zeros(1, opts.repeats) ; % for loop approach
   mcnTimes = zeros(1, opts.repeats) ;
+  if opts.includeRTimes, mRTimes= zeros(1, opts.repeats) ; end
 
   batchSize = [1 10 20] ;
   for bb = batchSize
@@ -38,12 +42,23 @@ function run_benchmarks(varargin)
         tic ; rgb2hsv(x) ; mTimes(ii) = toc ;
       end
 
+      if opts.includeRTimes
+        % to get an optimistic timing comparison, ignore the cost of reshaping
+        % and permuting and assume that the following reshape is done correctly
+        x_ = reshape(x, [], 3) ;
+        tic ; rgb2hsv(x_) ; mRTimes(ii) = toc ;
+      end
+
       tic ; vl_rgb2hsv(x) ; mcnTimes(ii) = toc ;
     end
 
     inSize = [opts.imSz([1 1]) 3 bb] ;
+    funcName = func2str(opts.native) ; mcnFuncName = func2str(opts.mcnFunc) ;
     fprintf('Statistics from %d runs\n', opts.repeats) ;
     fprintf('input image tensor size: [%d x %d x %d x %d]\n', inSize) ;
-    fprintf('rgb2hsv: %f (+/-%f)\n', mean(mTimes), std(mTimes)) ;
-    fprintf('vl_rgb2hsv: %f (+/-%f)\n', mean(mcnTimes), std(mcnTimes)) ;
+    fprintf('%s: %f (+/-%f)\n', funcName, mean(mTimes), std(mTimes)) ;
+    if opts.includeRTimes
+      fprintf('%s (reshaped): %f (+/-%f)\n', funcName, mean(mRTimes), std(mRTimes)) ;
+    end
+    fprintf('%s: %f (+/-%f)\n', mcnFuncName, mean(mcnTimes), std(mcnTimes)) ;
   end
