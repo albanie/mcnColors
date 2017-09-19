@@ -1,6 +1,6 @@
-function demo_rgb2hsv(varargin)
-%DEMO_RGB2HSV demonstrate a color space transformation
-%   DEMO_RGB2HSV(VARARGIN) compute a color space transformations
+function demo_colorTransforms(varargin)
+%DEMO_COLORTRANSFORMS demonstrates color space transformations
+%   DEMO_COLORTRANSFORMS(VARARGIN) computes color space transformations
 %   with `vl_rgb2hsv`.
 %
 %   DEMO_RGB2HSV(..., 'option', value, ...) accepts the following
@@ -15,8 +15,8 @@ function demo_rgb2hsv(varargin)
   opts.gpus = 1 ;
   opts = vl_argparse(opts, varargin) ;
 
-  % First, to enable comparison with the native rgb2hsv function, we must 
-  % use a batch size of 1:
+  % RGB -> HSV: to enable comparison with the native rgb2hsv function, 
+  % use a batch size of 1
   batchSize = 1 ;
   x = rand(500,500,3,batchSize) ;
   if numel(opts.gpus), x = gpuArray(x) ; end
@@ -42,3 +42,12 @@ function demo_rgb2hsv(varargin)
   y3 = vl_rgb2hsv(x) ; %#ok
   gpuBatchTime = toc ;
   fprintf('GPU vl_rgb2hsv: %g\n', gpuBatchTime) ;
+
+  % HSV -> RGB: As before, to enable comparison with the native hsv2rgb 
+  % function, use a batch size of 1
+  batchSize = 1 ;
+  x = rand(500,500,3,batchSize) ;
+  if numel(opts.gpus), x = gpuArray(x) ; end
+  tic ;
+  y1 = hsv2rgb(x) ;
+  cpuTime = toc ;

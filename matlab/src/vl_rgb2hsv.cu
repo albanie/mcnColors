@@ -23,15 +23,13 @@ the terms of the BSD license (see the COPYING file).
 
 /* option codes */
 enum {
-  opt_method = 0,
-  opt_subdivisions,
-  opt_transform,
-  opt_out_channels,
+  opt_reverse = 0,
   opt_verbose,
 } ;
 
 /* options */
 VLMXOption  options [] = {
+  {"Reverse",          1,   opt_reverse      },
   {"Verbose",          0,   opt_verbose      },
   {0,                  0,   0                }
 } ;
@@ -68,6 +66,7 @@ void mexFunction(int nout, mxArray *out[],
 {
   int verbosity = 0 ;
   int opt ;
+  bool reverse = false ;
   int next = IN_END ;
   mxArray const *optarg ;
 
@@ -77,8 +76,8 @@ void mexFunction(int nout, mxArray *out[],
 
   mexAtExit(atExit) ;
 
-  if (nin > 2) {
-    vlmxError(VLMXE_IllegalArgument, "Too many arguments.") ;
+  if (nin < 1) {
+    vlmxError(VLMXE_IllegalArgument, "Not enough input arguments.") ;
   }
   // backwards mode is not supported
   next = 1 ;
@@ -89,17 +88,22 @@ void mexFunction(int nout, mxArray *out[],
         ++ verbosity ;
         break ;
       }
+      case opt_reverse : {
+        if (!vlmxIsOfClass(optarg, mxLOGICAL_CLASS)) {
+          vlmxError(VLMXE_IllegalArgument, "REVERSE is not a boolean.") ;
+        }
+        reverse = mxGetPr(optarg)[0] ;
+        break ;
+      }
+
       default:
         break ;
     }
   }
 
+  // Load data and create output buffer
   vl::MexTensor data(context) ;
-
-  /* Get data */
   data.init(in[IN_DATA]) ;
-
-  /* Create output buffer */
   vl::TensorShape dataShape = data.getShape();
   dataShape.reshape(4) ;
 
@@ -113,7 +117,8 @@ void mexFunction(int nout, mxArray *out[],
   output.initWithZeros(deviceType, dataType, dataShape) ;
 
   if (verbosity > 0) {
-    mexPrintf("vl_rgb2hsv: forward; %s", (data.getDeviceType()==vl::VLDT_GPU) ? "GPU" : "CPU") ;
+    mexPrintf("vl_rgb2hsv: forward; %s", 
+                (data.getDeviceType()==vl::VLDT_GPU) ? "GPU" : "CPU") ;
     vl::print("vl_nnpsroipool: output: ", output) ;
   }
 
@@ -122,7 +127,11 @@ void mexFunction(int nout, mxArray *out[],
   /* -------------------------------------------------------------- */
 
   vl::ErrorCode error ;
-  error = vl::rgb2hsv_forward(context, output, data) ; 
+  if (reverse) {
+    error = vl::rgb2hsv_forward(context, output, data) ; 
+  } else {
+    error = vl::hsv2rgb_forward(context, output, data) ; 
+  }
 
   /* -------------------------------------------------------------- */
   /*                                                         Finish */

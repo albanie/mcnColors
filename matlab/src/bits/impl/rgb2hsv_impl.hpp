@@ -31,6 +31,18 @@ namespace vl { namespace impl {
             size_t size) ;
   } ;
 
+  template<vl::DeviceType dev, typename T>
+  struct hsv2rgb {
+
+    static vl::ErrorCode
+    forward(Context& context, 
+            T* output, 
+            T const* data,
+            size_t height, 
+            size_t width, 
+            size_t size) ;
+  } ;
+
 } }
 
 #endif /* defined(VL_RGB2HSV_H) */

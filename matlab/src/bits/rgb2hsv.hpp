@@ -18,6 +18,9 @@ namespace vl {
 
   vl::ErrorCode
   rgb2hsv_forward(vl::Context& context, vl::Tensor output, vl::Tensor data) ;
+
+  vl::ErrorCode
+  hsv2rgb_forward(vl::Context& context, vl::Tensor output, vl::Tensor data) ;
 }
 
 #endif /* defined(__vl__rgb2hsv__) */

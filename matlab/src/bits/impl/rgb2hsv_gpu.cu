@@ -91,11 +91,12 @@ rgb2hsv_kernel(T* output,
 }
 
 
-/* ------------------------------------------------------------ */
-/*                                                      forward */
-/* ------------------------------------------------------------ */
 
 namespace vl { namespace impl {
+
+/* ------------------------------------------------------------ */
+/*                                                      rgb2hsv */
+/* ------------------------------------------------------------ */
 
     template<typename T>
     struct rgb2hsv<vl::VLDT_GPU,T>
@@ -136,10 +137,56 @@ namespace vl { namespace impl {
     }
    }
  } ;
+
+/* ------------------------------------------------------------ */
+/*                                                      hsv2rgb */
+/* ------------------------------------------------------------ */
+
+    template<typename T>
+    struct hsv2rgb<vl::VLDT_GPU,T>
+    {
+
+    static vl::ErrorCode
+    forward(Context& context, 
+            T* output, 
+            T const* data,
+            size_t height, 
+            size_t width, 
+            size_t size) 
+{    
+    int volume = height * width * 3 * size ;
+
+    // set flag for input checking
+    bool* valid_range ;
+    cudaMalloc( (void **) &valid_range, sizeof(bool)) ;
+    cudaMemset(valid_range, 0, sizeof(bool)) ; // init to zero
+
+    rgb2hsv_kernel<T><<< vl::divideAndRoundUp(volume, 
+      VL_CUDA_NUM_THREADS), VL_CUDA_NUM_THREADS >>>(output, data, 
+        volume, valid_range, height, width, size) ;
+
+    bool* h_valid_range = new bool[1] ;
+    cudaMemcpy(h_valid_range, valid_range, sizeof(bool), cudaMemcpyDeviceToHost) ;
+    cudaError_t status = cudaPeekAtLastError() ;
+    // TODO: clean up error handling here
+    // currently the input validation is done on the device to prevent a speed 
+    // overhead, but requires a slightly ungainlly use of error codes.
+    if ((status != cudaSuccess) || (h_valid_range[0] != 0)) {
+        if (h_valid_range[0] != 0) {
+          mexPrintf("invalid RGB input values (must lie in [0,1]) \n") ;
+        }
+        return vl::VLE_Cuda ;
+    } else {
+      return vl::VLE_Success ;
+    }
+   }
+ } ;
 } } // namespace vl::impl
 
 template struct vl::impl::rgb2hsv<vl::VLDT_GPU, float> ;
+template struct vl::impl::hsv2rgb<vl::VLDT_GPU, float> ;
 
 #ifdef ENABLE_DOUBLE
 template struct vl::impl::rgb2hsv<vl::VLDT_GPU, double> ;
+template struct vl::impl::hsv2rgb<vl::VLDT_GPU, double> ;
 #endif
