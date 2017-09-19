@@ -2,7 +2,7 @@
 
 This directory contains efficient GPU implementations for color space transformations, designed to interface directly with MatConvNet. Each transformation is supported on batches of images (as four dimensional tensors).  
 
-### Supported transformations
+**Supported transformations**:
 
 * **rgb2hsv**
 * **hsv2rgb**
