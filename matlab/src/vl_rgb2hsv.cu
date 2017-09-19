@@ -119,7 +119,7 @@ void mexFunction(int nout, mxArray *out[],
   if (verbosity > 0) {
     mexPrintf("vl_rgb2hsv: forward; %s", 
                 (data.getDeviceType()==vl::VLDT_GPU) ? "GPU" : "CPU") ;
-    vl::print("vl_nnpsroipool: output: ", output) ;
+    vl::print("vl_rgb2hsv: output: ", output) ;
   }
 
   /* -------------------------------------------------------------- */
@@ -127,7 +127,7 @@ void mexFunction(int nout, mxArray *out[],
   /* -------------------------------------------------------------- */
 
   vl::ErrorCode error ;
-  if (reverse) {
+  if (!reverse) {
     error = vl::rgb2hsv_forward(context, output, data) ; 
   } else {
     error = vl::hsv2rgb_forward(context, output, data) ; 

@@ -7,4 +7,4 @@ function setup_mcnColors()
 
   root = fileparts(mfilename('fullpath')) ;
   addpath(root, [root '/matlab']) ;
-  addpath( [root '/matlab/mex']) ;
+  addpath( [root '/matlab/mex'], [root '/benchmarks']) ;

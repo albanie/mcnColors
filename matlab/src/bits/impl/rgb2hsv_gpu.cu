@@ -90,6 +90,90 @@ rgb2hsv_kernel(T* output,
   }
 }
 
+template<typename T> __global__ void
+hsv2rgb_kernel(T* output,
+              const T* data,
+              const int volume,
+              bool* valid_range, 
+              const int height,
+              const int width,
+              const int size)
+{
+  int rgbIndex = threadIdx.x + blockIdx.x * blockDim.x;
+  if (rgbIndex < volume) {
+    int depth = 3 ; // HSV input
+    int area = height * width ;
+    int s = rgbIndex % area ;  // spatial offset
+    int b = rgbIndex / (area * depth) ; // batch element
+    int hIdx = (b * area * 3) + s ;
+    int sIdx = hIdx + area ;
+    int vIdx = hIdx + 2 * area ;
+    int c = (rgbIndex / area) % depth ;
+
+    T H = data[hIdx] ;
+    T S = data[sIdx] ;
+    T V = data[vIdx] ;
+
+    // check input ranges
+    bool valid_H_range = H <= 1 && H >= 0 ;
+    bool valid_S_range = S <= 1 && S >= 0 ;
+    bool valid_V_range = V <= 1 && V >= 0 ;
+    if (!(valid_H_range && valid_S_range && valid_V_range)) {
+      valid_range[0] = 1 ;
+     }
+    T out ;
+    T H_ = H * 6 ; // follow standard convention for Hue computation
+    int cRegion = (int) trunc(H_) ; // map into one of six color regions
+    T rem = H_ - cRegion ; // store remainder
+
+    // incorporate the post addition of (V - chroma) into quantities
+    // that can be assigned directly
+    T Q1 = V * (1 - S) ;
+    T Q2 = V * (1 - (S * rem)) ;
+    T Q3 = V * (1 - (S * (1 - rem))) ;
+
+    switch (cRegion) {
+      case 0:
+        switch (c) { // RGB switch
+          case 0: out = V ; break ;  
+          case 1: out = Q3 ; break ;  
+          case 2: out = Q1 ; break ;  
+        } break ;
+      case 1:
+        switch (c) { // RGB switch
+          case 0: out = Q2 ; break ; 
+          case 1: out = V ; break ; 
+          case 2: out = Q1 ; break ;  
+        } break ;
+      case 2:
+        switch (c) { // RGB switch
+          case 0: out = Q1 ; break ; 
+          case 1: out = V ; break ; 
+          case 2: out = Q3 ; break ;  
+        } break ;
+      case 3:
+        switch (c) { // RGB switch
+          case 0: out = Q1 ; break ; 
+          case 1: out = Q2 ; break ; 
+          case 2: out = V ; break ;  
+        } break ;
+      case 4:
+        switch (c) { // RGB switch
+          case 0: out = Q3 ; break ; 
+          case 1: out = Q1 ; break ; 
+          case 2: out = V ; break ;  
+        } break ;
+      default:
+        switch (c) { // RGB switch
+          case 0: out = V ; break ; 
+          case 1: out = Q1 ; break ; 
+          case 2: out = Q2 ; break ;  
+        } break ;
+    }
+    output[rgbIndex] = out ;
+  }
+}
+
 
 
 namespace vl { namespace impl {
@@ -161,7 +245,7 @@ namespace vl { namespace impl {
     cudaMalloc( (void **) &valid_range, sizeof(bool)) ;
     cudaMemset(valid_range, 0, sizeof(bool)) ; // init to zero
 
-    rgb2hsv_kernel<T><<< vl::divideAndRoundUp(volume, 
+    hsv2rgb_kernel<T><<< vl::divideAndRoundUp(volume, 
       VL_CUDA_NUM_THREADS), VL_CUDA_NUM_THREADS >>>(output, data, 
         volume, valid_range, height, width, size) ;
 
