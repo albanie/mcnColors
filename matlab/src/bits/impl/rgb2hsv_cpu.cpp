@@ -155,12 +155,18 @@ namespace vl { namespace impl {
                 G = Q1 ; 
                 B = V ; 
                 break ;
-              default:
+              case 5:
                 R = V ; 
                 G = Q1 ; 
                 B = Q2 ; 
                 break ;
+              case 6: // (Handle edge case to match MATLAB)
+                R = V ; 
+                G = Q3 ; 
+                B = Q1 ; 
+                break ;
             }
+
             output[RH_offset] = R ;
             output[GS_offset] = G ;
             output[BV_offset] = B ;

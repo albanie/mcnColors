@@ -163,11 +163,17 @@ hsv2rgb_kernel(T* output,
           case 1: out = Q1 ; break ; 
           case 2: out = V ; break ;  
         } break ;
-      default:
+      case 5:
         switch (c) { // RGB switch
           case 0: out = V ; break ; 
           case 1: out = Q1 ; break ; 
           case 2: out = Q2 ; break ;  
+        } break ;
+      case 6: // match MATLAB convention here
+        switch (c) { // RGB switch
+          case 0: out = V ; break ;  
+          case 1: out = Q3 ; break ;  
+          case 2: out = Q1 ; break ;  
         } break ;
     }
     output[rgbIndex] = out ;

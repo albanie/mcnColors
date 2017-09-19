@@ -6,5 +6,5 @@ function setup_mcnColors()
 % Licensed under The MIT License [see LICENSE.md for details]
 
   root = fileparts(mfilename('fullpath')) ;
-  addpath(root, [root '/matlab']) ;
+  addpath(root, [root '/matlab'], [root '/misc']) ;
   addpath( [root '/matlab/mex'], [root '/benchmarks']) ;
