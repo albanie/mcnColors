@@ -9,7 +9,7 @@ This directory contains efficient GPU implementations for color space transforma
 
 ### Installation
 
-The easiest way to use this module is to install it with the `vl_contrib` package manager, with the following three commands from the root directory of your MatConvNet installation:
+The easiest way to use this module is to install it with the `vl_contrib` package manager, with the following commands from the root directory of your MatConvNet installation:
 
 ```
 vl_contrib('install', 'mcnColors') ;
