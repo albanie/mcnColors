@@ -78,6 +78,8 @@ vl::rgb2hsv_forward(vl::Context& context, vl::Tensor output, vl::Tensor data)
 /* ---------------------------------------------------------------- */
 /*                                                  hsv2rgb_forward */
 /* ---------------------------------------------------------------- */
+#undef DISPATCH
+#undef DISPATCH2
 
 #define DISPATCH(deviceType,T) \
 error = vl::impl::hsv2rgb<deviceType,T>::forward \
