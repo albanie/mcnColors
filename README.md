@@ -53,7 +53,7 @@ hsv2rgb: 0.100495 (+/-0.004921)
 
 ```
 
-The timings above are given in seconds.  The comparison across larger batch sizes is perhaps unfair, (sizes `10` and `20` are used above) since the matlab `rgb2hsv` function is only designed to operate on a 3D tensor, and therefore requires a for-loop (although this cost has been factored out of the benchmark). An alternative approach is to use reshape/permute operations, but in practice this tends to be significantly slower.
+The timings above are given as the mean-run time (in seconds) across 10 repeats (the standard deviation is given in parentheses).  The comparison across larger batch sizes is perhaps unfair, (sizes `10` and `20` are used above) since the matlab `rgb2hsv` function is only designed to operate on a 3D tensor, and therefore requires a for-loop (although this cost has been factored out of the benchmark). An alternative approach is to use reshape/permute operations, but in practice this tends to be significantly slower.
 
 ### Notes
 
